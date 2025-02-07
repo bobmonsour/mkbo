@@ -64,7 +64,7 @@ async function promptUser() {
 		},
 		{
 			type: "confirm",
-			name: "pageHasVideo",
+			name: "pageHasYoutube",
 			message: "Page has video?",
 			default: false,
 		},
@@ -101,8 +101,8 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
 	if (answers.pageHasCode) {
 		yamlContent += `pageHasCode: ${answers.pageHasCode}\n`;
 	}
-	if (answers.pageHasVideo) {
-		yamlContent += `pageHasVideo: ${answers.pageHasVideo}\n`;
+	if (answers.pageHasYoutube) {
+		yamlContent += `pageHapageHasYoutubesVideo: ${answers.pageHasYoutube}\n`;
 	}
 	if (answers.snow) {
 		yamlContent += `snow: ${answers.snow}\n`;
@@ -177,9 +177,9 @@ async function confirmOrEditYaml(yamlContent, answers) {
 				},
 				{
 					type: "confirm",
-					name: "pageHasVideo",
+					name: "pageHasYoutube",
 					message: "Page has video?",
-					default: answers.pageHasVideo,
+					default: answers.pageHasYoutube,
 				},
 				{
 					type: "input",
