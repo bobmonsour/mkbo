@@ -94,80 +94,87 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
 }
 
 async function confirmOrEditYaml(yamlContent, answers) {
-	console.log("Generated YAML content:");
-	console.log(yamlContent);
+	let accept = false;
 
-	const { accept } = await inquirer.prompt([
-		{
-			type: "confirm",
-			name: "accept",
-			message: "Do you accept the generated YAML content?",
-			default: true,
-		},
-	]);
+	while (!accept) {
+		console.log("Generated YAML content:");
+		console.log(yamlContent);
 
-	if (accept) {
-		return answers;
+		const response = await inquirer.prompt([
+			{
+				type: "confirm",
+				name: "accept",
+				message: "Do you accept the generated YAML content?",
+				default: true,
+			},
+		]);
+
+		accept = response.accept;
+
+		if (!accept) {
+			answers = await inquirer.prompt([
+				{
+					type: "input",
+					name: "title",
+					message: "Title:",
+					default: answers.title,
+				},
+				{
+					type: "input",
+					name: "date",
+					message: "Date (yyyy-mm-dd):",
+					default: answers.date,
+				},
+				{
+					type: "input",
+					name: "tags",
+					message: "Tags (comma-separated):",
+					default: answers.tags,
+				},
+				{
+					type: "input",
+					name: "description",
+					message: "Description:",
+					default: answers.description,
+				},
+				{
+					type: "confirm",
+					name: "pageHasCode",
+					message: "Page has code?",
+					default: answers.pageHasCode,
+				},
+				{
+					type: "confirm",
+					name: "snow",
+					message: "Snow?",
+					default: answers.snow,
+				},
+				{
+					type: "confirm",
+					name: "pageHasVideo",
+					message: "Page has video?",
+					default: answers.pageHasVideo,
+				},
+				{
+					type: "input",
+					name: "imageSource",
+					message: "Image source:",
+					default: answers.imageSource,
+				},
+				{
+					type: "input",
+					name: "imageAlt",
+					message: "Image alt text:",
+					default: answers.imageAlt,
+				},
+			]);
+
+			const result = generateYamlContent(answers);
+			yamlContent = result.yamlContent;
+		}
 	}
 
-	const editedAnswers = await inquirer.prompt([
-		{
-			type: "input",
-			name: "title",
-			message: "Title:",
-			default: answers.title,
-		},
-		{
-			type: "input",
-			name: "date",
-			message: "Date (yyyy-mm-dd):",
-			default: answers.date,
-		},
-		{
-			type: "input",
-			name: "tags",
-			message: "Tags (comma-separated):",
-			default: answers.tags,
-		},
-		{
-			type: "input",
-			name: "description",
-			message: "Description:",
-			default: answers.description,
-		},
-		{
-			type: "confirm",
-			name: "pageHasCode",
-			message: "Page has code?",
-			default: answers.pageHasCode,
-		},
-		{
-			type: "confirm",
-			name: "snow",
-			message: "Snow?",
-			default: answers.snow,
-		},
-		{
-			type: "confirm",
-			name: "pageHasVideo",
-			message: "Page has video?",
-			default: answers.pageHasVideo,
-		},
-		{
-			type: "input",
-			name: "imageSource",
-			message: "Image source:",
-			default: answers.imageSource,
-		},
-		{
-			type: "input",
-			name: "imageAlt",
-			message: "Image alt text:",
-			default: answers.imageAlt,
-		},
-	]);
-
-	return editedAnswers;
+	return answers;
 }
 
 async function main() {
