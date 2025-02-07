@@ -1,7 +1,10 @@
-A node script that I use to create a file for post, note, or til entry.
-It prompts the user to enter a title, from which a filename is generated.
+I often find myself making a copy of an existing entry on my website in order to start a new one. I've also begun to find this a bit annoying. I wanted a more direct, yet streamlined approach to starting a new entry.
+
+So, I developed this node script to create a file for post, note, or til (today, I learned, linked, or loved) entry on [my personal website](https://bobmonsour.com).
+
+It prompts me to enter a title, from which a filename is generated.
 It then prompts for a few 'always present' front matter elements,
-followed by some optional elements.
+as well as some optional elements.
 
 The file is created in the current directory.
 
@@ -13,7 +16,11 @@ On macOS, creating a symlink to the script in /usr/local/bin is done with the fo
 ln -s /path/to/script /usr/local/bin/mkbo
 ```
 
+Note that 'mkbo' is my name for the script, which stands for 'make an entry for the bobmonsour.com site'. I will likely make one, calling it 'mkbu' for making an entry for the [11ty Bundle site](https://11tybundle.dev).
+
 The example front matter resulting from creating a file named a-test-post.md is shown below. Note that it does not include several optional items that can be added when using the script.
+
+Feel free to adapt this for your own purposes.
 
 ```yaml
   ---
