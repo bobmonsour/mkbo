@@ -1,15 +1,19 @@
 {
 	"name": "mkbo",
 	"version": "1.0.0",
-	"main": "createYamlFile.js",
+	"main": "mkbo.js",
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
-	"author": "",
+	"author": {
+		"name": "Bob Monsour",
+		"email": "bob.monsour@gmail.com",
+		"url": "https://bobmonsour.com"
+	},
 	"license": "ISC",
-	"description": "",
+	"description": "Create an md file with front matter for use on bobmonsour.com",
 	"dependencies": {
 		"date-fns": "^4.1.0",
 		"inquirer": "^12.4.1",
