@@ -1,5 +1,7 @@
 I often find myself making a copy of an existing entry on my website in order to start a new one. I've also begun to find this a bit annoying. I wanted a more direct, yet streamlined approach to starting a new entry.
 
+I was catalyzed by a video that I watched. The video is below and here is his [blog post](https://deepakness.com/blog/create-posts-faster-11ty/) about it.
+
 So, I developed this node script to create a file for post, note, or til (today, I learned, linked, or loved) entry on [my personal website](https://bobmonsour.com).
 
 It prompts me to enter a title, from which a filename is generated.
