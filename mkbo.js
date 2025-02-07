@@ -1,5 +1,25 @@
 #!/usr/bin/env node
 
+// A node script that I use to create a file for post, note, or til entry.
+// It prompts the user to enter a title, from which a filename is generated.
+// It then prompts for a few 'always present' front matter elements,
+// followed by some optional elements.
+//
+// Example front matter resulting from creating a file named a-test-post.md
+//
+//  ---
+//  title: A test post
+//  description: This is a test post being created as an example of using this tool.
+//  date: 2025-02-07
+//  tags: [
+//    "blogging",
+//    "personal"
+//  ]
+//  image:
+//    source: a-test-post.jpg
+//    alt: A blog post being displayed on a laptop
+//  ---
+
 import fs from "fs";
 import inquirer from "inquirer";
 import slugify from "slugify";
