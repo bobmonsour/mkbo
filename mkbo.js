@@ -51,13 +51,14 @@ async function promptUser() {
 		{
 			type: "input",
 			name: "imageSource",
-			message: "Image source:",
+			message: "Image source (leave blank to skip):",
 			default: (answers) => `${slugify(answers.title, { lower: true })}.jpg`,
 		},
 		{
 			type: "input",
 			name: "imageAlt",
 			message: "Image alt text:",
+			when: (answers) => answers.imageSource.trim() !== "",
 		},
 	]);
 
@@ -86,11 +87,14 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
 	if (answers.snow) {
 		yamlContent += `snow: ${answers.snow}\n`;
 	}
-
-	yamlContent += `image:
+	if (answers.imageSource.trim() !== "") {
+		yamlContent += `image:
   source: ${answers.imageSource}
-  alt: ${answers.imageAlt}
----`;
+  alt: ${answers.imageAlt || ""}
+`;
+	}
+
+	yamlContent += `---`;
 
 	return { yamlContent, slugifiedTitle };
 }
@@ -160,7 +164,7 @@ async function confirmOrEditYaml(yamlContent, answers) {
 				{
 					type: "input",
 					name: "imageSource",
-					message: "Image source:",
+					message: "Image source (leave blank to skip):",
 					default: answers.imageSource,
 				},
 				{
@@ -168,6 +172,7 @@ async function confirmOrEditYaml(yamlContent, answers) {
 					name: "imageAlt",
 					message: "Image alt text:",
 					default: answers.imageAlt,
+					when: (answers) => answers.imageSource.trim() !== "",
 				},
 			]);
 
