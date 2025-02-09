@@ -1,3 +1,5 @@
+# mkbo - make an entry for the bobmonsour.com site
+
 I often find myself making a copy of an existing entry on my website in order to start a new one. I've also begun to find this a bit annoying. I wanted a more direct, yet streamlined approach to starting a new entry.
 
 I was catalyzed by a video that I watched. The video was created by [DeepanNess](https://deepakness.com/) and here is his [blog post](https://deepakness.com/blog/create-posts-faster-11ty/) about it.
