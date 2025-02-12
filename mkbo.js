@@ -83,6 +83,9 @@ async function promptUser() {
 			name: "imageAlt",
 			message: "Image alt text:",
 			when: (answers) => answers.imageSource.trim() !== "",
+			validate: (input) =>
+				input.trim() !== "" ||
+				"Alt text is required if an image source is provided",
 		},
 		{
 			type: "input",
@@ -138,7 +141,7 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
 	if (answers.imageSource.trim() !== "") {
 		yamlContent += `image:
   source: ${answers.imageSource}
-  alt: ${answers.imageAlt || ""}
+  alt: ${answers.imageAlt}
 `;
 		if (answers.creditPerson.trim() !== "") {
 			yamlContent += `  creditPerson: ${answers.creditPerson}
@@ -226,6 +229,9 @@ async function confirmOrEditYaml(yamlContent, answers) {
 					message: "Image alt text:",
 					default: answers.imageAlt,
 					when: (answers) => answers.imageSource.trim() !== "",
+					validate: (input) =>
+						input.trim() !== "" ||
+						"Alt text is required if an image source is provided",
 				},
 				{
 					type: "input",
