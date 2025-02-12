@@ -7,6 +7,8 @@
 //
 // Example front matter resulting from creating a file named a-test-post.md
 //
+// The file is created in the current working directory.
+//
 //  ---
 //  title: A test post
 //  description: This is a test post being created as an example of using this tool.
@@ -15,9 +17,11 @@
 //    "blogging",
 //    "personal"
 //  ]
-//  image:
+//  image:                                          optional
 //    source: a-test-post.jpg
-//    alt: A blog post being displayed on a laptop
+//    alt: A blog post being displayed on a laptop  required if 'source'
+//    creditPerson: Joe Photog                      optional
+//    creditLink: https://linktojoe.com             required if 'creditPerson'
 //  ---
 
 import fs from "fs";
@@ -65,7 +69,7 @@ async function promptUser() {
 		{
 			type: "confirm",
 			name: "pageHasYoutube",
-			message: "Page has video?",
+			message: "Page has YouTube?",
 			default: false,
 		},
 		{
@@ -79,6 +83,30 @@ async function promptUser() {
 			name: "imageAlt",
 			message: "Image alt text:",
 			when: (answers) => answers.imageSource.trim() !== "",
+		},
+		{
+			type: "input",
+			name: "creditPerson",
+			message: "Credit person (leave blank to skip):",
+			when: (answers) => answers.imageSource.trim() !== "",
+		},
+		{
+			type: "input",
+			name: "creditLink",
+			message: "Credit link (required if credit person is provided):",
+			when: (answers) => answers.creditPerson.trim() !== "",
+			validate: (input) => {
+				const urlPattern = new RegExp(
+					"^(https?:\\/\\/)?" + // protocol
+						"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
+						"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+						"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+						"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+						"(\\#[-a-z\\d_]*)?$",
+					"i" // fragment locator
+				);
+				return urlPattern.test(input) || "Please enter a valid URL";
+			},
 		},
 	]);
 
@@ -102,7 +130,7 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
 		yamlContent += `pageHasCode: ${answers.pageHasCode}\n`;
 	}
 	if (answers.pageHasYoutube) {
-		yamlContent += `pageHapageHasYoutubesVideo: ${answers.pageHasYoutube}\n`;
+		yamlContent += `pageHasYoutube: ${answers.pageHasYoutube}\n`;
 	}
 	if (answers.snow) {
 		yamlContent += `snow: ${answers.snow}\n`;
@@ -112,6 +140,11 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
   source: ${answers.imageSource}
   alt: ${answers.imageAlt || ""}
 `;
+		if (answers.creditPerson.trim() !== "") {
+			yamlContent += `  creditPerson: ${answers.creditPerson}
+  creditLink: ${answers.creditLink}
+`;
+		}
 	}
 
 	yamlContent += `---`;
@@ -178,7 +211,7 @@ async function confirmOrEditYaml(yamlContent, answers) {
 				{
 					type: "confirm",
 					name: "pageHasYoutube",
-					message: "Page has video?",
+					message: "Page has YouTube?",
 					default: answers.pageHasYoutube,
 				},
 				{
@@ -193,6 +226,30 @@ async function confirmOrEditYaml(yamlContent, answers) {
 					message: "Image alt text:",
 					default: answers.imageAlt,
 					when: (answers) => answers.imageSource.trim() !== "",
+				},
+				{
+					type: "input",
+					name: "creditPerson",
+					message: "Credit person (leave blank to skip):",
+					when: (answers) => answers.imageSource.trim() !== "",
+				},
+				{
+					type: "input",
+					name: "creditLink",
+					message: "Credit link (required if credit person is provided):",
+					when: (answers) => answers.creditPerson.trim() !== "",
+					validate: (input) => {
+						const urlPattern = new RegExp(
+							"^(https?:\\/\\/)?" + // protocol
+								"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
+								"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+								"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+								"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+								"(\\#[-a-z\\d_]*)?$",
+							"i" // fragment locator
+						);
+						return urlPattern.test(input) || "Please enter a valid URL";
+					},
 				},
 			]);
 
