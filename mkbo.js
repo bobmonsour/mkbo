@@ -32,250 +32,261 @@ import { format } from "date-fns";
 const today = format(new Date(), "yyyy-MM-dd");
 
 async function promptUser() {
-	const answers = await inquirer.prompt([
-		{
-			type: "input",
-			name: "title",
-			message: "Title:",
-		},
-		{
-			type: "input",
-			name: "date",
-			message: "Date (yyyy-mm-dd):",
-			default: today,
-		},
-		{
-			type: "input",
-			name: "tags",
-			message: "Tags (comma-separated):",
-		},
-		{
-			type: "input",
-			name: "description",
-			message: "Description:",
-		},
-		{
-			type: "confirm",
-			name: "pageHasCode",
-			message: "Page has code?",
-			default: false,
-		},
-		{
-			type: "confirm",
-			name: "snow",
-			message: "Snow?",
-			default: false,
-		},
-		{
-			type: "confirm",
-			name: "pageHasYoutube",
-			message: "Page has YouTube?",
-			default: false,
-		},
-		{
-			type: "input",
-			name: "imageSource",
-			message: "Image source (leave blank to skip):",
-			default: (answers) => `${slugify(answers.title, { lower: true })}.jpg`,
-		},
-		{
-			type: "input",
-			name: "imageAlt",
-			message: "Image alt text:",
-			when: (answers) => answers.imageSource.trim() !== "",
-			validate: (input) =>
-				input.trim() !== "" ||
-				"Alt text is required if an image source is provided",
-		},
-		{
-			type: "input",
-			name: "creditPerson",
-			message: "Credit person (leave blank to skip):",
-			when: (answers) => answers.imageSource.trim() !== "",
-		},
-		{
-			type: "input",
-			name: "creditLink",
-			message: "Credit link (required if credit person is provided):",
-			when: (answers) => answers.creditPerson.trim() !== "",
-			validate: (input) => {
-				const urlPattern = new RegExp(
-					"^(https?:\\/\\/)?" + // protocol
-						"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
-						"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-						"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-						"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-						"(\\#[-a-z\\d_]*)?$",
-					"i" // fragment locator
-				);
-				return urlPattern.test(input) || "Please enter a valid URL";
-			},
-		},
-	]);
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "title",
+      message: "Title:",
+    },
+    {
+      type: "input",
+      name: "date",
+      message: "Date (yyyy-mm-dd):",
+      default: today,
+    },
+    {
+      type: "input",
+      name: "tags",
+      message: "Tags (comma-separated):",
+    },
+    {
+      type: "input",
+      name: "description",
+      message: "Description:",
+    },
+    {
+      type: "confirm",
+      name: "pageHasCode",
+      message: "Page has code?",
+      default: false,
+    },
+    {
+      type: "confirm",
+      name: "snow",
+      message: "Snow?",
+      default: false,
+    },
+    {
+      type: "confirm",
+      name: "pageHasYoutube",
+      message: "Page has YouTube?",
+      default: false,
+    },
+    {
+      type: "confirm",
+      name: "hasImage",
+      message: "Will there be an image?",
+      default: false,
+    },
+    {
+      type: "input",
+      name: "imageSource",
+      message: "Image source:",
+      when: (answers) => answers.hasImage,
+      default: (answers) => `${slugify(answers.title, { lower: true })}.jpg`,
+    },
+    {
+      type: "input",
+      name: "imageAlt",
+      message: "Image alt text:",
+      when: (answers) => answers.hasImage && answers.imageSource.trim() !== "",
+      validate: (input) =>
+        input.trim() !== "" ||
+        "Alt text is required if an image source is provided",
+    },
+    {
+      type: "input",
+      name: "creditPerson",
+      message: "Credit person (leave blank to skip):",
+      when: (answers) => answers.hasImage && answers.imageSource.trim() !== "",
+    },
+    {
+      type: "input",
+      name: "creditLink",
+      message: "Credit link (required if credit person is provided):",
+      when: (answers) => answers.hasImage && answers.creditPerson.trim() !== "",
+      validate: (input) => {
+        const urlPattern = new RegExp(
+          "^(https?:\\/\\/)?" + // protocol
+            "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
+            "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+            "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+            "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+            "(\\#[-a-z\\d_]*)?$",
+          "i" // fragment locator
+        );
+        return urlPattern.test(input) || "Please enter a valid URL";
+      },
+    },
+  ]);
 
-	return answers;
+  return answers;
 }
 
 function generateYamlContent(answers) {
-	const slugifiedTitle = slugify(answers.title, { lower: true });
-	const tagsArray = answers.tags
-		? answers.tags.split(",").map((tag) => tag.trim())
-		: [];
+  const slugifiedTitle = slugify(answers.title, { lower: true });
+  const tagsArray = answers.tags
+    ? answers.tags.split(",").map((tag) => tag.trim())
+    : [];
 
-	let yamlContent = `---
+  let yamlContent = `---
 title: ${answers.title}
 description: ${answers.description}
 date: ${answers.date}
 tags: ${JSON.stringify(tagsArray, null, 2)}
 `;
 
-	if (answers.pageHasCode) {
-		yamlContent += `pageHasCode: ${answers.pageHasCode}\n`;
-	}
-	if (answers.pageHasYoutube) {
-		yamlContent += `pageHasYoutube: ${answers.pageHasYoutube}\n`;
-	}
-	if (answers.snow) {
-		yamlContent += `snow: ${answers.snow}\n`;
-	}
-	if (answers.imageSource.trim() !== "") {
-		yamlContent += `image:
+  if (answers.pageHasCode) {
+    yamlContent += `pageHasCode: ${answers.pageHasCode}\n`;
+  }
+  if (answers.pageHasYoutube) {
+    yamlContent += `pageHasYoutube: ${answers.pageHasYoutube}\n`;
+  }
+  if (answers.snow) {
+    yamlContent += `snow: ${answers.snow}\n`;
+  }
+
+  // Only add image-related YAML if hasImage is true
+  if (answers.hasImage) {
+    if (answers.imageSource.trim() !== "") {
+      yamlContent += `image:
   source: ${answers.imageSource}
   alt: ${answers.imageAlt}
 `;
-		if (answers.creditPerson.trim() !== "") {
-			yamlContent += `  creditPerson: ${answers.creditPerson}
+      if (answers.creditPerson.trim() !== "") {
+        yamlContent += `  creditPerson: ${answers.creditPerson}
   creditLink: ${answers.creditLink}
 `;
-		}
-	}
+      }
+    }
+  }
 
-	yamlContent += `---`;
+  yamlContent += `---`;
 
-	return { yamlContent, slugifiedTitle };
+  return { yamlContent, slugifiedTitle };
 }
 
 async function confirmOrEditYaml(yamlContent, answers) {
-	let accept = false;
+  let accept = false;
 
-	while (!accept) {
-		console.log("Generated YAML content:");
-		console.log(yamlContent);
+  while (!accept) {
+    console.log("Generated YAML content:");
+    console.log(yamlContent);
 
-		const response = await inquirer.prompt([
-			{
-				type: "confirm",
-				name: "accept",
-				message: "Do you accept the generated YAML content?",
-				default: true,
-			},
-		]);
+    const response = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "accept",
+        message: "Do you accept the generated YAML content?",
+        default: true,
+      },
+    ]);
 
-		accept = response.accept;
+    accept = response.accept;
 
-		if (!accept) {
-			answers = await inquirer.prompt([
-				{
-					type: "input",
-					name: "title",
-					message: "Title:",
-					default: answers.title,
-				},
-				{
-					type: "input",
-					name: "date",
-					message: "Date (yyyy-mm-dd):",
-					default: answers.date,
-				},
-				{
-					type: "input",
-					name: "tags",
-					message: "Tags (comma-separated):",
-					default: answers.tags,
-				},
-				{
-					type: "input",
-					name: "description",
-					message: "Description:",
-					default: answers.description,
-				},
-				{
-					type: "confirm",
-					name: "pageHasCode",
-					message: "Page has code?",
-					default: answers.pageHasCode,
-				},
-				{
-					type: "confirm",
-					name: "snow",
-					message: "Snow?",
-					default: answers.snow,
-				},
-				{
-					type: "confirm",
-					name: "pageHasYoutube",
-					message: "Page has YouTube?",
-					default: answers.pageHasYoutube,
-				},
-				{
-					type: "input",
-					name: "imageSource",
-					message: "Image source (leave blank to skip):",
-					default: answers.imageSource,
-				},
-				{
-					type: "input",
-					name: "imageAlt",
-					message: "Image alt text:",
-					default: answers.imageAlt,
-					when: (answers) => answers.imageSource.trim() !== "",
-					validate: (input) =>
-						input.trim() !== "" ||
-						"Alt text is required if an image source is provided",
-				},
-				{
-					type: "input",
-					name: "creditPerson",
-					message: "Credit person (leave blank to skip):",
-					when: (answers) => answers.imageSource.trim() !== "",
-				},
-				{
-					type: "input",
-					name: "creditLink",
-					message: "Credit link (required if credit person is provided):",
-					when: (answers) => answers.creditPerson.trim() !== "",
-					validate: (input) => {
-						const urlPattern = new RegExp(
-							"^(https?:\\/\\/)?" + // protocol
-								"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
-								"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-								"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-								"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-								"(\\#[-a-z\\d_]*)?$",
-							"i" // fragment locator
-						);
-						return urlPattern.test(input) || "Please enter a valid URL";
-					},
-				},
-			]);
+    if (!accept) {
+      answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "title",
+          message: "Title:",
+          default: answers.title,
+        },
+        {
+          type: "input",
+          name: "date",
+          message: "Date (yyyy-mm-dd):",
+          default: answers.date,
+        },
+        {
+          type: "input",
+          name: "tags",
+          message: "Tags (comma-separated):",
+          default: answers.tags,
+        },
+        {
+          type: "input",
+          name: "description",
+          message: "Description:",
+          default: answers.description,
+        },
+        {
+          type: "confirm",
+          name: "pageHasCode",
+          message: "Page has code?",
+          default: answers.pageHasCode,
+        },
+        {
+          type: "confirm",
+          name: "snow",
+          message: "Snow?",
+          default: answers.snow,
+        },
+        {
+          type: "confirm",
+          name: "pageHasYoutube",
+          message: "Page has YouTube?",
+          default: answers.pageHasYoutube,
+        },
+        {
+          type: "input",
+          name: "imageSource",
+          message: "Image source (leave blank to skip):",
+          default: answers.imageSource,
+        },
+        {
+          type: "input",
+          name: "imageAlt",
+          message: "Image alt text:",
+          default: answers.imageAlt,
+          when: (answers) => answers.imageSource.trim() !== "",
+          validate: (input) =>
+            input.trim() !== "" ||
+            "Alt text is required if an image source is provided",
+        },
+        {
+          type: "input",
+          name: "creditPerson",
+          message: "Credit person (leave blank to skip):",
+          when: (answers) => answers.imageSource.trim() !== "",
+        },
+        {
+          type: "input",
+          name: "creditLink",
+          message: "Credit link (required if credit person is provided):",
+          when: (answers) => answers.creditPerson.trim() !== "",
+          validate: (input) => {
+            const urlPattern = new RegExp(
+              "^(https?:\\/\\/)?" + // protocol
+                "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
+                "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+                "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                "(\\#[-a-z\\d_]*)?$",
+              "i" // fragment locator
+            );
+            return urlPattern.test(input) || "Please enter a valid URL";
+          },
+        },
+      ]);
 
-			const result = generateYamlContent(answers);
-			yamlContent = result.yamlContent;
-		}
-	}
+      const result = generateYamlContent(answers);
+      yamlContent = result.yamlContent;
+    }
+  }
 
-	return answers;
+  return answers;
 }
 
 async function main() {
-	let answers = await promptUser();
-	let { yamlContent, slugifiedTitle } = generateYamlContent(answers);
+  let answers = await promptUser();
+  let { yamlContent, slugifiedTitle } = generateYamlContent(answers);
 
-	answers = await confirmOrEditYaml(yamlContent, answers);
-	({ yamlContent, slugifiedTitle } = generateYamlContent(answers));
+  answers = await confirmOrEditYaml(yamlContent, answers);
+  ({ yamlContent, slugifiedTitle } = generateYamlContent(answers));
 
-	fs.writeFileSync(`${slugifiedTitle}.md`, yamlContent, "utf8");
-	console.log(`File ${slugifiedTitle}.md created successfully!`);
+  fs.writeFileSync(`${slugifiedTitle}.md`, yamlContent, "utf8");
+  console.log(`File ${slugifiedTitle}.md created successfully!`);
 }
 
 main();
