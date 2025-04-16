@@ -6,11 +6,11 @@ I was catalyzed by a video that I watched. The video was created by [DeepanNess]
 
 So, I developed this node script to create a file for post, note, or til (today, I learned, linked, or loved) entry on [my personal website](https://bobmonsour.com).
 
-It prompts me to enter a title, from which a filename is generated.
+First, it prompts me to enter which type of entry I want to create. The options are: post, note, or til. It will create the file in the proper directory in my project.
+
+It then prompts me to enter a title, from which a filename is generated.
 It then prompts for a few 'always present' front matter elements,
 as well as some optional elements.
-
-The file is created in the current directory.
 
 I create a symlink to the script in a directory that is in my path, so that I can run it from any directory. For example, the directory /usr/bin/local is in my path, so I create a symlink to the script in that directory.
 
