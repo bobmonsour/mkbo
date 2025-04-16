@@ -24,6 +24,8 @@
 //    creditLink: https://linktojoe.com             required if 'creditPerson'
 //  ---
 
+#!/usr/bin/env node
+
 import fs from "fs";
 import inquirer from "inquirer";
 import slugify from "slugify";
@@ -31,8 +33,17 @@ import { format } from "date-fns";
 
 const today = format(new Date(), "yyyy-MM-dd");
 
+// Base directory for the entries
+const BASE_DIR = "/Users/Bob/Dropbox/Docs/Sites/bobmonsour.com/src/";
+
 async function promptUser() {
   const answers = await inquirer.prompt([
+    {
+      type: "list",
+      name: "entryType",
+      message: "What type of entry would you like to create?",
+      choices: ["Post", "Note", "TIL"],
+    },
     {
       type: "input",
       name: "title",
@@ -161,132 +172,33 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
     }
   }
 
-  yamlContent += `---`;
+  yamlContent += `drafts: true
+  ---`;
 
   return { yamlContent, slugifiedTitle };
-}
-
-async function confirmOrEditYaml(yamlContent, answers) {
-  let accept = false;
-
-  while (!accept) {
-    console.log("Generated YAML content:");
-    console.log(yamlContent);
-
-    const response = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "accept",
-        message: "Do you accept the generated YAML content?",
-        default: true,
-      },
-    ]);
-
-    accept = response.accept;
-
-    if (!accept) {
-      answers = await inquirer.prompt([
-        {
-          type: "input",
-          name: "title",
-          message: "Title:",
-          default: answers.title,
-        },
-        {
-          type: "input",
-          name: "date",
-          message: "Date (yyyy-mm-dd):",
-          default: answers.date,
-        },
-        {
-          type: "input",
-          name: "tags",
-          message: "Tags (comma-separated):",
-          default: answers.tags,
-        },
-        {
-          type: "input",
-          name: "description",
-          message: "Description:",
-          default: answers.description,
-        },
-        {
-          type: "confirm",
-          name: "pageHasCode",
-          message: "Page has code?",
-          default: answers.pageHasCode,
-        },
-        {
-          type: "confirm",
-          name: "snow",
-          message: "Snow?",
-          default: answers.snow,
-        },
-        {
-          type: "confirm",
-          name: "pageHasYoutube",
-          message: "Page has YouTube?",
-          default: answers.pageHasYoutube,
-        },
-        {
-          type: "input",
-          name: "imageSource",
-          message: "Image source (leave blank to skip):",
-          default: answers.imageSource,
-        },
-        {
-          type: "input",
-          name: "imageAlt",
-          message: "Image alt text:",
-          default: answers.imageAlt,
-          when: (answers) => answers.imageSource.trim() !== "",
-          validate: (input) =>
-            input.trim() !== "" ||
-            "Alt text is required if an image source is provided",
-        },
-        {
-          type: "input",
-          name: "creditPerson",
-          message: "Credit person (leave blank to skip):",
-          when: (answers) => answers.imageSource.trim() !== "",
-        },
-        {
-          type: "input",
-          name: "creditLink",
-          message: "Credit link (required if credit person is provided):",
-          when: (answers) => answers.creditPerson.trim() !== "",
-          validate: (input) => {
-            const urlPattern = new RegExp(
-              "^(https?:\\/\\/)?" + // protocol
-                "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
-                "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-                "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-                "(\\#[-a-z\\d_]*)?$",
-              "i" // fragment locator
-            );
-            return urlPattern.test(input) || "Please enter a valid URL";
-          },
-        },
-      ]);
-
-      const result = generateYamlContent(answers);
-      yamlContent = result.yamlContent;
-    }
-  }
-
-  return answers;
 }
 
 async function main() {
   let answers = await promptUser();
   let { yamlContent, slugifiedTitle } = generateYamlContent(answers);
 
-  answers = await confirmOrEditYaml(yamlContent, answers);
-  ({ yamlContent, slugifiedTitle } = generateYamlContent(answers));
+  // Determine the directory based on the entry type
+  const entryTypeToDir = {
+    Post: "posts",
+    Note: "notes",
+    TIL: "til",
+  };
+  const targetDir = `${BASE_DIR}${entryTypeToDir[answers.entryType]}/`;
 
-  fs.writeFileSync(`${slugifiedTitle}.md`, yamlContent, "utf8");
-  console.log(`File ${slugifiedTitle}.md created successfully!`);
+  // Ensure the target directory exists
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+
+  // Write the file to the appropriate directory
+  const filePath = `${targetDir}${slugifiedTitle}.md`;
+  fs.writeFileSync(filePath, yamlContent, "utf8");
+  console.log(`File created successfully at: ${filePath}`);
 }
 
 main();
