@@ -24,8 +24,6 @@
 //    creditLink: https://linktojoe.com             required if 'creditPerson'
 //  ---
 
-#!/usr/bin/env node
-
 import fs from "fs";
 import inquirer from "inquirer";
 import slugify from "slugify";
@@ -173,7 +171,7 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
   }
 
   yamlContent += `drafts: true
-  ---`;
+---`;
 
   return { yamlContent, slugifiedTitle };
 }
