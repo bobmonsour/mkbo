@@ -197,6 +197,13 @@ async function main() {
   const filePath = `${targetDir}${slugifiedTitle}.md`;
   fs.writeFileSync(filePath, yamlContent, "utf8");
   console.log(`File created successfully at: ${filePath}`);
+
+  // Open the file in VS Code
+  exec(`code "${filePath}"`, (error) => {
+    if (error) {
+      console.error(`Failed to open file in VS Code: ${error.message}`);
+    }
+  });
 }
 
 main();
