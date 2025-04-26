@@ -24,6 +24,7 @@
 //    creditLink: https://linktojoe.com             required if 'creditPerson'
 //  ---
 
+import { exec } from "child_process";
 import fs from "fs";
 import inquirer from "inquirer";
 import slugify from "slugify";
