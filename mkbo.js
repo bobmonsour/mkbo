@@ -171,7 +171,7 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
     }
   }
 
-  yamlContent += `drafts: true
+  yamlContent += `draft: true
 ---`;
 
   return { yamlContent, slugifiedTitle };
