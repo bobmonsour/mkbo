@@ -22,6 +22,7 @@
 //    alt: A blog post being displayed on a laptop  required if 'source'
 //    creditPerson: Joe Photog                      optional
 //    creditLink: https://linktojoe.com             required if 'creditPerson'
+//    creditType: illustration                      default is 'photo' if none provided
 //  ---
 
 import { exec } from "child_process";
@@ -128,6 +129,13 @@ async function promptUser() {
         return urlPattern.test(input) || "Please enter a valid URL";
       },
     },
+    {
+      type: "input",
+      name: "creditType",
+      message: "Credit type (default is 'Photo'):",
+      when: (answers) => answers.hasImage && answers.creditPerson.trim() !== "",
+      default: "Photo",
+    },
   ]);
 
   return answers;
@@ -166,6 +174,7 @@ tags: ${JSON.stringify(tagsArray, null, 2)}
       if (answers.creditPerson.trim() !== "") {
         yamlContent += `  creditPerson: ${answers.creditPerson}
   creditLink: ${answers.creditLink}
+  creditType: ${answers.creditType}
 `;
       }
     }
