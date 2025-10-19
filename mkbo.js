@@ -143,9 +143,16 @@ async function promptUser() {
 
 function generateYamlContent(answers) {
   const slugifiedTitle = slugify(answers.title, { lower: true });
-  const tagsArray = answers.tags
+  let tagsArray = answers.tags
     ? answers.tags.split(",").map((tag) => tag.trim())
     : [];
+
+  // Add entry type as first tag for TIL and Note entries
+  if (answers.entryType === "TIL") {
+    tagsArray.unshift("til");
+  } else if (answers.entryType === "Note") {
+    tagsArray.unshift("notes");
+  }
 
   let yamlContent = `---
 title: ${answers.title}
@@ -190,20 +197,16 @@ async function main() {
   let answers = await promptUser();
   let { yamlContent, slugifiedTitle } = generateYamlContent(answers);
 
-  // Determine the directory based on the entry type
-  const entryTypeToDir = {
-    Post: "posts",
-    Note: "notes",
-    TIL: "til",
-  };
-  const targetDir = `${BASE_DIR}${entryTypeToDir[answers.entryType]}/`;
+  // Extract year from the date and create year-based subdirectory
+  const year = answers.date.split("-")[0];
+  const targetDir = `${BASE_DIR}posts/${year}/`;
 
   // Ensure the target directory exists
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
   }
 
-  // Write the file to the appropriate directory
+  // Write the file to the year-based subdirectory
   const filePath = `${targetDir}${slugifiedTitle}.md`;
   fs.writeFileSync(filePath, yamlContent, "utf8");
   console.log(`File created successfully at: ${filePath}`);
